@@ -55,6 +55,9 @@ android {
         }
     }
     buildTypes {
+        debug {
+            ndk { abiFilters "x86" }
+        }
         release {
             signingConfig signingConfigs.release
         }
