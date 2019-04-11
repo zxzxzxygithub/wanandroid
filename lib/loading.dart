@@ -40,7 +40,7 @@ class _LoadingState extends State<LoadingPage> {
       child: Stack(
         children: <Widget>[
           //加载页面居中背景图 使用cover模式
-          Image.asset("images/loading.png",fit: BoxFit.cover,),
+          Image.asset("images/loading.webp",fit: BoxFit.cover,),
         ],
       ),
     );

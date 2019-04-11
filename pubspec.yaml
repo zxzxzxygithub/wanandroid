@@ -60,7 +60,7 @@ flutter:
   assets:
 
   #加载页面图片资源
-  - images/loading.png
+  - images/loading.webp
   - images/flutter.png
   - images/head.jpg
   - images/arrow_right.png
