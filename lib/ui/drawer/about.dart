@@ -105,3 +105,48 @@ class AboutMePageState extends State<AboutMePage> {
         ));
   }
 }
+
+
+class TextWidget extends StatefulWidget {
+  @override
+  _TextWidgetState createState() => _TextWidgetState();
+}
+
+class _TextWidgetState extends State<TextWidget> {
+
+  @override
+  void initState() {
+    super.initState();
+
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+  }
+
+  @override
+  void didUpdateWidget(TextWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+
+  }
+}
+
+

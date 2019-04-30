@@ -6,6 +6,7 @@ import 'package:wanandroid_ngu/ui/navigation/navigation.dart';
 import 'package:wanandroid_ngu/ui/project/project.dart';
 import 'package:wanandroid_ngu/ui/publicc/publicc.dart';
 import 'package:wanandroid_ngu/ui/search/search.dart';
+import 'package:wanandroid_ngu/ui/video/video.dart';
 
 
 //应用页面使用有状态Widget
@@ -20,15 +21,16 @@ class App extends StatefulWidget {
 class AppState extends State<App> {
   int _selectedIndex = 0; //当前选中项的索引
 
-  final appBarTitles = ['玩Android', '体系', '公众号', '导航', "项目"];
-  int elevation = 4;
+  final appBarTitles = ['玩Android', '体系', '公众号', '导航', "项目", "video"];
+  int elevation = 5;
 
   var pages = <Widget>[
     HomePage(),
     KnowledgePage(),
     PubliccPage(),
     NavigationPage(),
-    ProjectPage()
+    ProjectPage(),
+    VideoPage(),
   ];
 
   @override
@@ -62,7 +64,8 @@ class AppState extends State<App> {
             BottomNavigationBarItem(icon: Icon(Icons.chat), title: Text('公众号')),
             BottomNavigationBarItem(
                 icon: Icon(Icons.navigation), title: Text('导航')),
-            BottomNavigationBarItem(icon: Icon(Icons.book), title: Text('项目'))
+            BottomNavigationBarItem(icon: Icon(Icons.book), title: Text('项目')),
+            BottomNavigationBarItem(icon: Icon(Icons.airplanemode_active), title: Text('video')),
           ],
           type: BottomNavigationBarType.fixed, //设置显示的模式
           currentIndex: _selectedIndex, //当前选中项的索引
