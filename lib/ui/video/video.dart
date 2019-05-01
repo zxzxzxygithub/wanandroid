@@ -19,6 +19,8 @@ class MediaState extends State<VideoPage> {
   var overlayOffstage = false;
   var lastVideoController;
   var lastChewController;
+  var lastPosition = 0;
+  
 
   ScrollController listViewController = ScrollController();
 
@@ -55,6 +57,7 @@ class MediaState extends State<VideoPage> {
           listViewController.position.maxScrollExtent) {
         print('scroll to bottom');
       }
+
     });
   }
 
@@ -101,12 +104,24 @@ class MediaState extends State<VideoPage> {
           ),
           body: NotificationListener(
             onNotification:(ScrollNotification note){
-//              print(' 滚动位置。');  // 滚动位置。
-//              print(note.metrics.pixels.toInt());  // 滚动位置。
-//              print(' extentInside。');  // 滚动位置。
-//              print(note.metrics.extentInside);  // 滚动位置。
-              print(' axisDirection。');  // 滚动位置。
-              print(note.metrics.axisDirection.toString());  // 滚动位置。
+              var pixels = note.metrics.pixels;
+              var height = MediaQuery.of(context).size.height;
+              var halfHeight = height/2;
+              var position = (pixels/height).floor();
+              var restPosition = ((pixels-position*height)/halfHeight).floor();
+              var currentPosition = position+restPosition;
+//              print('itemheight $height');
+//              print('pixels $pixels');
+//              print('position $position');
+//              print('totalPosition $totalPosition');
+              if(currentPosition != lastPosition){
+                VideoPlayerController l = vControllerList[lastPosition];
+                l.pause();
+                VideoPlayerController c = vControllerList[currentPosition];
+                c.play();
+                lastPosition = currentPosition;
+              }
+            
             },
             child: listView,
           ),));
@@ -128,11 +143,6 @@ class MediaState extends State<VideoPage> {
     var _chewieController = getChewieController(bean, _controller);
     cControllerList.add(_chewieController);
     lastChewController = _chewieController;
-    if (index == curIndex) {
-      _controller.play();
-    } else {
-      _controller.pause();
-    }
     return _chewieController;
   }
 

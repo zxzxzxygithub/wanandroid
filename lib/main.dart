@@ -3,6 +3,7 @@ import 'package:wanandroid_ngu/common/application.dart';
 import 'package:wanandroid_ngu/common/user.dart';
 import 'package:wanandroid_ngu/event/change_theme_event.dart';
 import 'package:wanandroid_ngu/splash_screen.dart';
+import 'package:wanandroid_ngu/ui/video/video.dart';
 import 'package:wanandroid_ngu/util/theme_util.dart';
 import 'package:wanandroid_ngu/util/utils.dart';
 import './app.dart';
@@ -67,7 +68,7 @@ class MyAppState extends State<MyApp> {
         "app": (BuildContext context) => new App(),
         "splash": (BuildContext context) => new SplashScreen(),
       },
-      home: new LoadingPage(),
+      home: new VideoPage(),
     );
   }
 }
