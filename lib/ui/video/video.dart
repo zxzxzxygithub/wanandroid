@@ -14,11 +14,9 @@ class MediaState extends State<VideoPage> {
   var curIndex = 1;
   var videoUrl = 'http://mpmallapp.oss-cn-beijing.aliyuncs.com/dynamic/20190426/t0modmjaiqzi9o4cpulx.mp4';
   var beanList = List();
-  var vControllerList = List();
-  var cControllerList = List();
+  var vControllerList = Map();
+  var cControllerList = Map();
   var overlayOffstage = false;
-  var lastVideoController;
-  var lastChewController;
   var lastPosition = 0;
   var itemHeight;
   
@@ -30,6 +28,8 @@ class MediaState extends State<VideoPage> {
   double max;
 
   var pageItems = List<Widget>();
+
+  var minCount = 2;
 
   @override
   void initState() {
@@ -57,16 +57,14 @@ class MediaState extends State<VideoPage> {
     map4['url'] = url4;
     map4['videoidth'] = 368;
     map4['videoHeight'] = 350;
-    for (int i1 = 0; i1 < 4; i1++) {
+    for (int i1 = 0; i1 < 6; i1++) {
       beanList.add(map4);
     }
+    var length = beanList.length;
+    print('beanlist length $length');
     listViewController.addListener(() {
       max = listViewController.position.maxScrollExtent;
     });
-    for (int i = 0; i < beanList.length; i++) {
-      var container = getVideoContainer(i);
-      pageItems.add(container);
-    }
   }
 
   @override
@@ -82,19 +80,19 @@ class MediaState extends State<VideoPage> {
   }
 
   void clearVControl() {
-    for (var v in vControllerList) {
+    for (var v in vControllerList.keys) {
       print('dispose v start');
-      v.dispose();
+      vControllerList[v].dispose();
       print('dispose v end');
     }
-    for (var c in cControllerList) {
+    for (var c in cControllerList.keys) {
       print('dispose c start');
-      c.dispose();
+      cControllerList[c].dispose();
       print('dispose c end');
     }
   }
 
-  List listviewContainers = List();
+//  var listviewContainers = List();
   var setPosition = -1;
   var minuseCount = 0;
   var pixels;
@@ -106,74 +104,20 @@ class MediaState extends State<VideoPage> {
         .of(context)
         .size
         .height;
-    var listView = ListView.builder(
-            controller: listViewController,
+    var pageView = PageView.builder(
       itemCount: beanList.length,
-            itemBuilder: (context, index) {
-              // if cached, use cache
-              print('index $index');
-              var length = listviewContainers.length;
-              print('listviewcontainer length $length');
-              if (index <= length - 1) {
-                var storedContainer = listviewContainers[index];
-                if (storedContainer != null) {
-                  print('use cached list item~~~~~~~~~~~~~');
-                  return storedContainer;
-                }
-              }
-              Container container = getVideoContainer(index);
-              listviewContainers.add(container);
-              print('add  $index');
-              return container;
-            },
-          );
-    var pageView = PageView(
       scrollDirection: Axis.vertical,
       onPageChanged: onPageChanged,
-      children: pageItems,
-    );
-    var notificationListener = NotificationListener(
-      onNotification: (ScrollNotification note) {
-        pixels = note.metrics.pixels;
-        var position = (pixels / itemHeight).floor();
-        currentPosition = position;
-//              print('itemheight $height');
-//              print('pixels $pixels');
-//              print('position $position');
-//              print('totalPosition $currentPosition');
-//              print('current positon $currentPosition');
-//              print(
-//                  '~~~~~~~ ~~~~~~~ ~~~~~~~ ~~~~~~~ currentPosition currentPosition currentPosition currentPosition ~~~~~~~ $currentPosition ');
-//              if(currentPosition-lastPosition==2 && vControllerList.length!=6){
-//                currentPosition = lastPosition;
-//              }
-        if (currentPosition != setPosition) {
-          setState(() {
-            if (beanList.length < 6) {
-              beanList.add(map3);
-              beanList.add(map4);
-            }
-            if (beanList.length == 6 && vControllerList.length == 6) {
-              vControllerList[0].dispose();
-              vControllerList[1].dispose();
-              cControllerList[0].dispose();
-              cControllerList[1].dispose();
-              vControllerList.removeRange(0, 2);
-              cControllerList.removeRange(0, 2);
-              beanList.removeRange(0, 2);
-              listviewContainers.removeRange(0, 2);
-              currentPosition = currentPosition - 2;
-              lastPosition = currentPosition;
-            }
-            playCurrentPauselast(currentPosition);
-            setPosition = currentPosition;
-          }
-          );
-        } else {
-          playCurrentPauselast(currentPosition);
-        }
+      itemBuilder: (context, index) {
+//        if (index <= listviewContainers.length - 1 &&
+//            listviewContainers[index] != null) {
+//          return listviewContainers[index];
+//        }
+        Container container = getVideoContainer(index);
+//        listviewContainers.add(container);
+        print('add  $index');
+        return container;
       },
-      child: listView,
     );
     return WillPopScope(
         onWillPop: _onWillPop,
@@ -195,6 +139,7 @@ class MediaState extends State<VideoPage> {
   }
 
   var lastPage = -1;
+  var downWard = false;
 
   onPageChanged(page) {
     print('page $page');
@@ -202,7 +147,56 @@ class MediaState extends State<VideoPage> {
       vControllerList[lastPage].pause();
     }
     vControllerList[page].play();
+    if (page < lastPage) {
+      downWard = true;
+    } else {
+      downWard = false;
+    }
     lastPage = page;
+    if (page >= beanList.length - 5) {
+      setState(() {
+        beanList.add(map4);
+        beanList.add(map3);
+//        var length = listviewContainers.length;
+//        print('containers length $length');
+      });
+    }
+    if (vControllerList.length >= 6) {
+      if (downWard) {
+        vControllerList[minCount].dispose();
+        vControllerList[minCount + 1].dispose();
+      } else {
+        vControllerList[minCount - 2].dispose();
+        vControllerList[minCount - 1].dispose();
+      }
+      vControllerList.removeWhere((key, value) {
+        var condition = key < minCount;
+        if (downWard) {
+          condition = key >= minCount;
+        }
+        return condition;
+      });
+      if (downWard) {
+        cControllerList[minCount].dispose();
+        cControllerList[minCount + 1].dispose();
+      } else {
+        cControllerList[minCount - 2].dispose();
+        cControllerList[minCount - 1].dispose();
+      }
+      cControllerList.removeWhere((key, value) {
+        var condition = key < minCount;
+        if (downWard) {
+          condition = key >= minCount;
+        }
+        return condition;
+      });
+      if (downWard) {
+        minCount -= 2;
+      } else {
+        minCount += 2;
+      }
+    }
+
   }
 
   void playCurrentPauselast(int currentPosition) {
@@ -219,8 +213,6 @@ class MediaState extends State<VideoPage> {
 
   ChewieController buildController(int index) {
     var bean = beanList[index];
-    lastVideoController?.pause();
-    lastChewController?.pause();
     var curUrl = bean['url'];
 //    print('build controller');
 //    print('index');
@@ -229,18 +221,13 @@ class MediaState extends State<VideoPage> {
 //    print(curUrl);
 
     var _controller = VideoPlayerController.network(curUrl);
-    lastVideoController = _controller;
-    var containsV = vControllerList.contains(_controller);
-    if (!containsV) {
-      vControllerList.add(_controller);
-    }
+    vControllerList[index] = _controller;
     var vlength = vControllerList.length;
     print('vcontroller length $vlength');
     var _chewieController = getChewieController(bean, _controller);
-    cControllerList.add(_chewieController);
+    cControllerList[index] = _chewieController;
     var clength = cControllerList.length;
     print('ccontroller length $clength');
-    lastChewController = _chewieController;
     return _chewieController;
   }
 
@@ -269,19 +256,7 @@ class MediaState extends State<VideoPage> {
 
   Future<bool> _onWillPop() {
     print('_onWillPop');
-    print(vControllerList.toString());
-    for (var v in vControllerList) {
-      print('_onWillPop dispose v start');
-      v.dispose();
-      print('_onWillPop dispose v end');
-    }
-    print(cControllerList.toString());
-    for (var c in cControllerList) {
-      print('_onWillPop dispose c start');
-      c.dispose();
-      print('_onWillPop dispose c end');
-    }
-    print('$cControllerList.length' + '~');
+    clearVControl();
     return Future.value(true);
   }
 }
